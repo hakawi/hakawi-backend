@@ -19,32 +19,14 @@ class UserCollectibleRepository extends ServiceEntityRepository
         parent::__construct($registry, UserCollectible::class);
     }
 
-    // /**
-    //  * @return UserCollectible[] Returns an array of UserCollectible objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAllCollectibleOfUser($uid)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('uc')
+            ->join('uc.user', 'u')
+            ->join('uc.collectible', 'c')
+            ->where('u.uid = :uid')
+            ->setParameter('uid', $uid)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserCollectible
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

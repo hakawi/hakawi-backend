@@ -20,7 +20,7 @@ class User
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $uid;
 
@@ -30,23 +30,37 @@ class User
     private $phaseSeed;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserCollectible::class, mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $userCollectible;
+    private $point;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserMarket::class, mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserCollectible::class, mappedBy="user", orphanRemoval=true)
      */
-    private $userMarket;
+    private $userCollectibles;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserMission::class, mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserMarket::class, mappedBy="user", orphanRemoval=true)
      */
-    private $userMission;
+    private $userMarkets;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserMission::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $userMissions;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Market::class, mappedBy="owner", orphanRemoval=true)
+     */
+    private $markets;
 
     public function __construct()
     {
         $this->collectible = new ArrayCollection();
+        $this->userCollectibles = new ArrayCollection();
+        $this->userMarkets = new ArrayCollection();
+        $this->userMissions = new ArrayCollection();
+        $this->markets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -78,53 +92,134 @@ class User
         return $this;
     }
 
-    public function getUserCollectible(): ?UserCollectible
+    public function getPoint(): ?int
     {
-        return $this->userCollectible;
+        return $this->point;
     }
 
-    public function setUserCollectible(UserCollectible $userCollectible): self
+    public function setPoint(?int $point): self
     {
-        // set the owning side of the relation if necessary
-        if ($userCollectible->getUser() !== $this) {
+        $this->point = $point;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserCollectible[]
+     */
+    public function getUserCollectibles(): Collection
+    {
+        return $this->userCollectibles;
+    }
+
+    public function addUserCollectible(UserCollectible $userCollectible): self
+    {
+        if (!$this->userCollectibles->contains($userCollectible)) {
+            $this->userCollectibles[] = $userCollectible;
             $userCollectible->setUser($this);
         }
 
-        $this->userCollectible = $userCollectible;
+        return $this;
+    }
+
+    public function removeUserCollectible(UserCollectible $userCollectible): self
+    {
+        if ($this->userCollectibles->removeElement($userCollectible)) {
+            // set the owning side to null (unless already changed)
+            if ($userCollectible->getUser() === $this) {
+                $userCollectible->setUser(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getUserMarket(): ?UserMarket
+    /**
+     * @return Collection|UserMarket[]
+     */
+    public function getUserMarkets(): Collection
     {
-        return $this->userMarket;
+        return $this->userMarkets;
     }
 
-    public function setUserMarket(UserMarket $userMarket): self
+    public function addUserMarket(UserMarket $userMarket): self
     {
-        // set the owning side of the relation if necessary
-        if ($userMarket->getUser() !== $this) {
+        if (!$this->userMarkets->contains($userMarket)) {
+            $this->userMarkets[] = $userMarket;
             $userMarket->setUser($this);
         }
 
-        $this->userMarket = $userMarket;
+        return $this;
+    }
+
+    public function removeUserMarket(UserMarket $userMarket): self
+    {
+        if ($this->userMarkets->removeElement($userMarket)) {
+            // set the owning side to null (unless already changed)
+            if ($userMarket->getUser() === $this) {
+                $userMarket->setUser(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getUserMission(): ?UserMission
+    /**
+     * @return Collection|UserMission[]
+     */
+    public function getUserMissions(): Collection
     {
-        return $this->userMission;
+        return $this->userMissions;
     }
 
-    public function setUserMission(UserMission $userMission): self
+    public function addUserMission(UserMission $userMission): self
     {
-        // set the owning side of the relation if necessary
-        if ($userMission->getUser() !== $this) {
+        if (!$this->userMissions->contains($userMission)) {
+            $this->userMissions[] = $userMission;
             $userMission->setUser($this);
         }
 
-        $this->userMission = $userMission;
+        return $this;
+    }
+
+    public function removeUserMission(UserMission $userMission): self
+    {
+        if ($this->userMissions->removeElement($userMission)) {
+            // set the owning side to null (unless already changed)
+            if ($userMission->getUser() === $this) {
+                $userMission->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Market[]
+     */
+    public function getMarkets(): Collection
+    {
+        return $this->markets;
+    }
+
+    public function addMarket(Market $market): self
+    {
+        if (!$this->markets->contains($market)) {
+            $this->markets[] = $market;
+            $market->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMarket(Market $market): self
+    {
+        if ($this->markets->removeElement($market)) {
+            // set the owning side to null (unless already changed)
+            if ($market->getOwner() === $this) {
+                $market->setOwner(null);
+            }
+        }
 
         return $this;
     }

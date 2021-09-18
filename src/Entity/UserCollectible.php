@@ -17,14 +17,20 @@ class UserCollectible
      */
     private $id;
 
+
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="userCollectible", cascade={"persist", "remove"})
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $position = [];
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="userCollectibles")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
     /**
-     * @ORM\OneToOne(targetEntity=Collectible::class, inversedBy="userCollectible", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Collectible::class, inversedBy="userCollectibles")
      * @ORM\JoinColumn(nullable=false)
      */
     private $collectible;
@@ -34,12 +40,24 @@ class UserCollectible
         return $this->id;
     }
 
+    public function getPosition(): ?array
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?array $position): self
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
@@ -51,7 +69,7 @@ class UserCollectible
         return $this->collectible;
     }
 
-    public function setCollectible(Collectible $collectible): self
+    public function setCollectible(?Collectible $collectible): self
     {
         $this->collectible = $collectible;
 

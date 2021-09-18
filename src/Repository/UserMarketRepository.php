@@ -19,32 +19,14 @@ class UserMarketRepository extends ServiceEntityRepository
         parent::__construct($registry, UserMarket::class);
     }
 
-    // /**
-    //  * @return UserMarket[] Returns an array of UserMarket objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAllMarketOfUser($uid)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->createQueryBuilder('uc')
+                    ->join('uc.user', 'u')
+                    ->join('um.market', 'm')
+                    ->where('u.uid = :uid')
+                    ->setParameter('uid', $uid)
+                    ->getQuery()
+                    ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserMarket
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

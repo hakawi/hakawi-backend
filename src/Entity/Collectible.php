@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CollectibleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,9 +45,20 @@ class Collectible
     private $market;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserCollectible::class, mappedBy="collectible", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserCollectible::class, mappedBy="collectible", orphanRemoval=true)
      */
-    private $userCollectible;
+    private $userCollectibles;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserMission::class, mappedBy="collectible", orphanRemoval=true)
+     */
+    private $userMissions;
+
+    public function __construct()
+    {
+        $this->userCollectibles = new ArrayCollection();
+        $this->userMissions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,19 +135,62 @@ class Collectible
         return $this;
     }
 
-    public function getUserCollectible(): ?UserCollectible
+    /**
+     * @return Collection|UserCollectible[]
+     */
+    public function getUserCollectibles(): Collection
     {
-        return $this->userCollectible;
+        return $this->userCollectibles;
     }
 
-    public function setUserCollectible(UserCollectible $userCollectible): self
+    public function addUserCollectible(UserCollectible $userCollectible): self
     {
-        // set the owning side of the relation if necessary
-        if ($userCollectible->getCollectible() !== $this) {
+        if (!$this->userCollectibles->contains($userCollectible)) {
+            $this->userCollectibles[] = $userCollectible;
             $userCollectible->setCollectible($this);
         }
 
-        $this->userCollectible = $userCollectible;
+        return $this;
+    }
+
+    public function removeUserCollectible(UserCollectible $userCollectible): self
+    {
+        if ($this->userCollectibles->removeElement($userCollectible)) {
+            // set the owning side to null (unless already changed)
+            if ($userCollectible->getCollectible() === $this) {
+                $userCollectible->setCollectible(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserMission[]
+     */
+    public function getUserMissions(): Collection
+    {
+        return $this->userMissions;
+    }
+
+    public function addUserMission(UserMission $userMission): self
+    {
+        if (!$this->userMissions->contains($userMission)) {
+            $this->userMissions[] = $userMission;
+            $userMission->setCollectible($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserMission(UserMission $userMission): self
+    {
+        if ($this->userMissions->removeElement($userMission)) {
+            // set the owning side to null (unless already changed)
+            if ($userMission->getCollectible() === $this) {
+                $userMission->setCollectible(null);
+            }
+        }
 
         return $this;
     }

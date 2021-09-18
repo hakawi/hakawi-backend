@@ -2,13 +2,22 @@
 
 namespace App\Controller\Api;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
+use App\Exception\Api\ContentEmptyException;
+use App\Exception\Api\ServerException;
+use App\Service\User\UserService;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 class CrudUserController extends AbstractApiController
 {
+    private $userService;
+
+    public function __construct(
+        UserService $userService
+    ) {
+        $this->userService = $userService;
+    }
+
     /**
      * @Route("/api/user/", name="api_user_index")
      */
@@ -24,7 +33,18 @@ class CrudUserController extends AbstractApiController
      */
     public function createUser(Request $request)
     {
-        return $this->jsonSuccess();
+        try {
+            $data = $this->getJsonData($request);
+            if ($data['uid'] || $data['phase_seed']) {
+                $this->userService->create($data);
+                return $this->jsonSuccess();
+            }
+            return $this->jsonError('Empty data');
+        } catch (ContentEmptyException $e) {
+            return $this->jsonError('Empty data');
+        } catch (ServerException $e) {
+            return $this->jsonError('Error create user: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MissionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,9 +35,14 @@ class Mission
     private $defaultOrder;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserMission::class, mappedBy="Mission", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserMission::class, mappedBy="mission", orphanRemoval=true)
      */
-    private $userMission;
+    private $userMissions;
+
+    public function __construct()
+    {
+        $this->userMissions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -78,20 +85,34 @@ class Mission
         return $this;
     }
 
-    public function getUserMission(): ?UserMission
+    /**
+     * @return Collection|UserMission[]
+     */
+    public function getUserMissions(): Collection
     {
-        return $this->userMission;
+        return $this->userMissions;
     }
 
-    public function setUserMission(UserMission $userMission): self
+    public function addUserMission(UserMission $userMission): self
     {
-        // set the owning side of the relation if necessary
-        if ($userMission->getMission() !== $this) {
+        if (!$this->userMissions->contains($userMission)) {
+            $this->userMissions[] = $userMission;
             $userMission->setMission($this);
         }
 
-        $this->userMission = $userMission;
+        return $this;
+    }
+
+    public function removeUserMission(UserMission $userMission): self
+    {
+        if ($this->userMissions->removeElement($userMission)) {
+            // set the owning side to null (unless already changed)
+            if ($userMission->getMission() === $this) {
+                $userMission->setMission(null);
+            }
+        }
 
         return $this;
     }
+
 }

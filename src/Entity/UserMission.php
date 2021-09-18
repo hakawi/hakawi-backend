@@ -18,16 +18,28 @@ class UserMission
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="userMission", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="userMissions")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
     /**
-     * @ORM\OneToOne(targetEntity=Mission::class, inversedBy="userMission", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Mission::class, inversedBy="userMissions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Mission;
+    private $mission;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $compeleted_at;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Collectible::class, inversedBy="userMissions")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $collectible;
+
 
     public function getId(): ?int
     {
@@ -39,7 +51,7 @@ class UserMission
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
@@ -48,13 +60,39 @@ class UserMission
 
     public function getMission(): ?Mission
     {
-        return $this->Mission;
+        return $this->mission;
     }
 
-    public function setMission(Mission $Mission): self
+    public function setMission(?Mission $mission): self
     {
-        $this->Mission = $Mission;
+        $this->mission = $mission;
 
         return $this;
     }
+
+    public function getCompeletedAt(): ?\DateTimeInterface
+    {
+        return $this->compeleted_at;
+    }
+
+    public function setCompeletedAt(\DateTimeInterface $compeleted_at): self
+    {
+        $this->compeleted_at = $compeleted_at;
+
+        return $this;
+    }
+
+    public function getCollectible(): ?Collectible
+    {
+        return $this->collectible;
+    }
+
+    public function setCollectible(?Collectible $collectible): self
+    {
+        $this->collectible = $collectible;
+
+        return $this;
+    }
+
+
 }

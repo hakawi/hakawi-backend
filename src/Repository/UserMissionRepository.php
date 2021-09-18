@@ -19,32 +19,14 @@ class UserMissionRepository extends ServiceEntityRepository
         parent::__construct($registry, UserMission::class);
     }
 
-    // /**
-    //  * @return UserMission[] Returns an array of UserMission objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getAllMissionOfUser($uid)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->createQueryBuilder('uc')
+                    ->join('uc.user', 'u')
+                    ->join('um.mission', 'm')
+                    ->where('u.uid = :uid')
+                    ->setParameter('uid', $uid)
+                    ->getQuery()
+                    ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?UserMission
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

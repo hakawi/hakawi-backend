@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MarketRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,9 +30,25 @@ class Market
     private $item;
 
     /**
-     * @ORM\OneToOne(targetEntity=UserMarket::class, mappedBy="market", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=UserMarket::class, mappedBy="market", orphanRemoval=true)
      */
-    private $userMarket;
+    private $userMarkets;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $price;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="markets")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $owner;
+
+    public function __construct()
+    {
+        $this->userMarkets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,20 +79,58 @@ class Market
         return $this;
     }
 
-    public function getUserMarket(): ?UserMarket
+    /**
+     * @return Collection|UserMarket[]
+     */
+    public function getUserMarkets(): Collection
     {
-        return $this->userMarket;
+        return $this->userMarkets;
     }
 
-    public function setUserMarket(UserMarket $userMarket): self
+    public function addUserMarket(UserMarket $userMarket): self
     {
-        // set the owning side of the relation if necessary
-        if ($userMarket->getMarket() !== $this) {
+        if (!$this->userMarkets->contains($userMarket)) {
+            $this->userMarkets[] = $userMarket;
             $userMarket->setMarket($this);
         }
 
-        $this->userMarket = $userMarket;
+        return $this;
+    }
+
+    public function removeUserMarket(UserMarket $userMarket): self
+    {
+        if ($this->userMarkets->removeElement($userMarket)) {
+            // set the owning side to null (unless already changed)
+            if ($userMarket->getMarket() === $this) {
+                $userMarket->setMarket(null);
+            }
+        }
 
         return $this;
     }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
 }

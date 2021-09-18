@@ -18,16 +18,18 @@ class UserMarket
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="userMarket", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="userMarkets")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 
     /**
-     * @ORM\OneToOne(targetEntity=Market::class, inversedBy="userMarket", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Market::class, inversedBy="userMarkets")
      * @ORM\JoinColumn(nullable=false)
      */
     private $market;
+
+
 
     public function getId(): ?int
     {
@@ -39,7 +41,7 @@ class UserMarket
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
@@ -51,10 +53,12 @@ class UserMarket
         return $this->market;
     }
 
-    public function setMarket(Market $market): self
+    public function setMarket(?Market $market): self
     {
         $this->market = $market;
 
         return $this;
     }
+
+
 }
