@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Market
 {
+    use ObjectToArrTrait;
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

@@ -23,7 +23,7 @@ class UserMarketRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('uc')
                     ->join('uc.user', 'u')
-                    ->join('um.market', 'm')
+                    ->join('uc.market', 'm')
                     ->where('u.uid = :uid')
                     ->setParameter('uid', $uid)
                     ->getQuery()

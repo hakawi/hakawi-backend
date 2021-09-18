@@ -23,10 +23,26 @@ class UserMissionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('uc')
                     ->join('uc.user', 'u')
-                    ->join('um.mission', 'm')
+                    ->join('uc.mission', 'm')
                     ->where('u.uid = :uid')
                     ->setParameter('uid', $uid)
                     ->getQuery()
                     ->getResult();
+    }
+
+    /**
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getMissionOfUser($uid, $missionId)
+    {
+        return $this->createQueryBuilder('uc')
+                    ->join('uc.user', 'u')
+                    ->join('uc.mission', 'm')
+                    ->where('u.uid = :uid')
+                    ->setParameter('uid', $uid)
+                    ->andWhere('m.id = :missionId')
+                    ->setParameter('missionId', $missionId)
+                    ->getQuery()
+                    ->getOneOrNullResult();
     }
 }

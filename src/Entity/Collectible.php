@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Collectible
 {
+    use ObjectToArrTrait;
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
