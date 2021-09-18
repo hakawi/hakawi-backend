@@ -43,9 +43,9 @@ class UserDashboardService
         }
         $data             = [];
         $data['point']    = $user->getPoint();
-        $data['items']    = $user->getUserCollectibles();
-        $data['missions'] = $user->getUserMissions();
-        $data['markets']  = $user->getUserMarkets();
+        $data['items']    = $user->getUserCollectibles()->toArray();
+        $data['missions'] = $user->getUserMissions()->toArray();
+        $data['markets']  = $user->getUserMarkets()->toArray();
 
         return $this->mappingResponse($data);
     }
@@ -63,15 +63,11 @@ class UserDashboardService
     public function mappingItemsRes($items)
     {
         $returnData = [];
-
         foreach ($items as $item) {
             $itemFactory = [];
-            dump($item);
             if ($item instanceof UserCollectible) {
                 $itemCollectible = $item->getCollectible();
-                $itemFactory  = [
-                    'position' => $item->getPosition()
-                ];
+                $position  = $item->getPosition();
             } else if ($item instanceof Collectible) {
                 $itemCollectible = $item;
             }
@@ -83,6 +79,7 @@ class UserDashboardService
                     'width'    => $itemCollectible->getWidth(),
                     'height'   => $itemCollectible->getHeight(),
                     'type'     => $itemCollectible->getType(),
+                    'position' => $position ?? null
                 ];
             }
 
@@ -106,7 +103,7 @@ class UserDashboardService
                     'title' => $userMission->getTitle(),
                     'description' => $userMission->getDescription(),
                     'order' => $userMission->getDefaultOrder(),
-                    'collectible' => $this->mappingItemsRes($mission->getCollectible())
+                    'collectible' => $this->mappingItemsRes([$mission->getCollectible()])
                 ];
                 $returnData[] = $missionFactory;
             }
@@ -127,7 +124,7 @@ class UserDashboardService
                     'owner' => [
                         'uid' => $userMarket->getOwner()->getUid(),
                     ],
-                    'item' => $this->mappingItemsRes($marketItem),
+                    'item' => $this->mappingItemsRes([$marketItem]),
                     'price' => $userMarket->getPrice()
                 ];
             }
